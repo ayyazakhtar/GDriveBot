@@ -7,11 +7,7 @@ import requests
 from pprint import pprint
 import json
 
-########################################## ------------ KickAss -------------############################################
-
-
-url_base= 'https://www.kat.cr/'
-# x = "https://kat.cr/usearch/DC'sLegends of tomorrow S01E01 category%3Atv/?field=seeders&sorder=desc"s
+############################### ------------ KickAss -------------####################################
 
 def get_tv_show_episode(show_name, season, episode):
 	if(season < 10):
@@ -23,37 +19,51 @@ def get_tv_show_episode(show_name, season, episode):
 		ep_string = ep_string  + "E0" + str(episode)
 	else:
 		ep_string = ep_string  + "E" + str(episode)		
+		ep_string = ep_string  + "E" + str(episode)		
 
-	torrent = get_magnet_link([show_name, ep_string], "tv")
+	show_name = show_name.split(' ')
+	show_name.append(ep_string)
+
+	torrent = get_magnet_link(show_name, "tv")
 	
 	if torrent == None:
-		print("Episdoe not found")
-		return None;
-	else:
-		return torrent
+		print("episode not found")
+
+	return torrent
 	# print "name : " + torrent['name']
 	# print "size : " + torrent['size']
 	# print "seeders: " + torrent['seeders']
 	# print  "magnet Link : " + torrent['magnet']
 
 def search_keyword_in_name(name, keywords):
+	
 	match = True
 	name = name.lower()		
 	name = name.split(' ')
-	
+
 	for keyword in keywords:		
 		search_res = [s for s in name if keyword.lower() == s]
 		if search_res == []:
+			print 'keyword "'+keyword +  ' not matched'
 			match = False
 			
 	return match
 
+def remove_brackets(str_list):
+	list = []
+	for word in str_list:
+		word = word.replace(')','')
+		word = word.replace('(','')
+		list.append(word)
+	return list
 
 def get_magnet_link(search_list, category):
-	# print "----------------------------------------------------------------"
-	url = url_base + "usearch/" + ' '.join(search_list) + " category%3A" + category +  "/?field=seeders&sorder=desc"
-	response = requests.get(url, verify= True)
+	search_list = remove_brackets(search_list)
+	url = "https://www.kat.cr/usearch/" + ' '.join(search_list) + " category%3A" + category +  "/?field=seeders&sorder=desc"
+
+	response = requests.get(url, verify= True)	
 	soup = BeautifulSoup(response.text,"html.parser")
+	
 	table = soup.find("table", {"class": "data"})
 	torrent = {"name":"", "magnet":"", "size":0, "seeders":0}
 	if table == None:
