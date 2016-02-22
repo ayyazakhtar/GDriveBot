@@ -6,6 +6,7 @@ import os
 import requests
 from pprint import pprint
 import json
+import pdb
 
 ############################### ------------ KickAss -------------####################################
 
@@ -18,7 +19,6 @@ def get_tv_show_episode(show_name, season, episode):
 	if(episode < 10):	
 		ep_string = ep_string  + "E0" + str(episode)
 	else:
-		ep_string = ep_string  + "E" + str(episode)		
 		ep_string = ep_string  + "E" + str(episode)		
 
 	show_name = show_name.split(' ')
@@ -40,7 +40,7 @@ def search_keyword_in_name(name, keywords):
 	match = True
 	name = name.lower()		
 	name = name.split(' ')
-
+	
 	for keyword in keywords:		
 		search_res = [s for s in name if keyword.lower() == s]
 		if search_res == []:
@@ -58,12 +58,11 @@ def remove_brackets(str_list):
 	return list
 
 def get_magnet_link(search_list, category):
-	search_list = remove_brackets(search_list)
+	search_list = remove_brackets(search_list)	
 	url = "https://www.kat.cr/usearch/" + ' '.join(search_list) + " category%3A" + category +  "/?field=seeders&sorder=desc"
 
 	response = requests.get(url, verify= True)	
 	soup = BeautifulSoup(response.text,"html.parser")
-	
 	table = soup.find("table", {"class": "data"})
 	torrent = {"name":"", "magnet":"", "size":0, "seeders":0}
 	if table == None:
@@ -83,4 +82,4 @@ def get_magnet_link(search_list, category):
 			return torrent
 			break
 					
-	return None;
+	return None

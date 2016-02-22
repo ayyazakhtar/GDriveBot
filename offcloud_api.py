@@ -12,59 +12,91 @@ import json
 
 offcloud_user_name =  'mraqkhan@icloud.com'
 offcloud_password = 'Pakland990'
-def get_auth_offcloud(username, password):
+offcloud_auth_cookie= ''
+my_user_name = '13mseeaakhtar@seecs.edu.pk'
+my_account = {}
+
+# this has to be set before
+def auth_offcloud(username, password):
+	global offcloud_auth_cookie
 	session = requests.Session()
 	url="https://offcloud.com/api/login/classic"
 	data = {"username": username, "password": password}
 	response = session.get(url, data=data)		
-	return  session.cookies.get_dict()
-
-def get_remote_account_list():
-	cookie = get_auth_offcloud(offcloud_user_name, offcloud_password)
-	url = 'https://offcloud.com/api/remote-account/list'
+	offcloud_auth_cookie = session.cookies.get_dict()
+########################### get_remote_account_list ################################
+''' Returns the total remote account authorized with offcloud
+'''
+def get_remote_account_list():	
+	url = "https://offcloud.com/api/remote-account/list"
 	data = {}
-	response = requests.get(url,data=data,cookies=cookie)
+	response = requests.get(url,data=data,cookies=offcloud_auth_cookie)
 	if response.status_code == 200:
 		return(json.loads(response.text))
 	else:
 		return None
-	
+###############################################################################		
 
-def check_status(ref_no):
-	return "downloading"
+########################### add_remote_download ################################
+''' A Dictionary of the following structure is returned
+{  "requestId": "",
+  "site": "",
+  "status": "",
+  "originalLink": "",
+  "createdOn": ""
+}'''
+def add_remote_download(down_link):
+	url = "https://offcloud.com/api/remote/download"
+	data = {"url" :down_link ,"remoteOptionId": my_account['remoteOptionId']}
+	response = requests.post(url,data=data,cookies=offcloud_auth_cookie)
 	
-if __name__ == '__main__':
-	offcloud_auth_cookie  = get_auth_offcloud('mraqkhan@icloud.com', 'Pakland990')	
-	
-	url = 'https://offcloud.com/api/remote-account/list'	
-	data = {}
-	print offcloud_auth_cookie
-	response = requests.get(url,data=data,cookies=offcloud_auth_cookie)
-	# import pdb; pdb.set_trace()	
+	if response.status_code == 200:
+		return(json.loads(response.text))
+	else:
+		return None
+###############################################################################
+
 		
-	print response.status_code
-	account_info =  json.loads(response.text)	
-	pprint(account_info)
-	print type(account_info)
-	exit();
-		# # {
-		# #   "accountId": "5686edea098580b372000527",
-		# #   "remoteOptionId": "5686edea098580b372000527",
-		# #   "type": "gdrive",
-		# #   "username": "14mseeakhan@seecs.edu.pk"
-		# # },
+def init():
+	global my_account
+	account_info =get_remote_account_list()	
+	for account in account_info['data']:
+		if account['username'] == my_user_name:
+			my_account = account
+	
+	
+########################### check_status ################################
+''' A Dictionary of the following structure is returned
+{ "status": {
+    "status": "",
+    "amount": ,
+    "requestId": "",
+    "fileSize": ,
+    "downloadingSpeed": "",
+    "downloadingTime": ,
+    "fileName": ""
+  }	
+} '''
+def check_status(requestId ):
+	url = "https://offcloud.com/api/remote/status"
+	data = {"requestId" :requestId }
+	response = requests.post(url,data=data,cookies=offcloud_auth_cookie)
+	print response
+	print response.text
+	if response.status_code == 200:
+		return(json.loads(response.text))
+	else:
+		return None
+###############################################################################
+	
 
-	# # url = 'https://offcloud.com/api/remote/status/'
-	# # url = 'https://offcloud.com/api/remote/download'
-	# # for account in account_info["data"]:
-	# if True:
-		# print "-------------------------------------------------"
-		# # print account['username']
-		# # data = {"url" :"magnet:?xt=urn:btih:4B51C4107B41178F60BA6F6411C6A85CA6BA38DC&dn=magic+mike+xxl+2015+1080p+brrip+x264+yify&tr=udp%3A%2F%2Ftracker.publicbt.com%2Fannounce&tr=udp%3A%2F%2Fglotorrents.pw%3A6969%2Fannounce" ,"remoteOptionId": '568906c082747ad611000091'}
-				# # 568906c082747ad611000091
-				# # ,"requestId": account['remoteOptionId']}
-		# print requests.post(url,data=data,cookies=session.cookies.get_dict()).text
+status_msgs = ["created", "downloading", "downloaded"]
 
+if __name__ == '__main__':
+	auth_offcloud(offcloud_user_name, offcloud_password)
+	init()
+	# down_data = add_remote_download(magnet)
+	# check_status(down_data['requestId'])
+	check_status('56cb0a4a4ff06a5c740000b6')
 
-	# get_auth_offcloud();
-	# get_remote_account_list();
+	exit()
