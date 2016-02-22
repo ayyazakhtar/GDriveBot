@@ -172,6 +172,7 @@ def main(argv):
 				print '\tEpisode : ' + str(episode.EpisodeNumber)
 				episode_no = episode.EpisodeNumber - 1
 				today = (date.today()).toordinal()
+
 				ep_date = (episode.FirstAired).toordinal()
 				if ep_date < today + 1 : 				# +1 to download episodes that are atleast a day old.
 												
@@ -180,17 +181,21 @@ def main(argv):
 				
 					if show_data['seasons'][season_no][episode_no] == {}:
 						episode_torrent = kat_search.get_tv_show_episode(show.SeriesName, season.season_number, episode.EpisodeNumber)						
-						
-						if episode_torrent == None:							
-							show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_no_magnet",'request_id' : 0, 'attempt' : 1}
+						cur_ep = {"season":season.season_number, "episode":episode.EpisodeNumber}
+						if episode_torrent == None:														
+							if cur_ep not in show_data["erred_episodes"]:
+								show_data["erred_episodes"].append(cur_ep)
+							# show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_no_magnet",'request_id' : 0, 'attempt' : 1}
 							print("ERROR_no_magnet")
 						else:							
 							show_data['seasons'][season_no][episode_no] = start_episode_download(episode_torrent['magnet'], 0)
+							if cur_ep in show_data["erred_episodes"]:
+								show_data["erred_episodes"].remove(cur_ep)
 							# print(show_data['seasons'][season_no][episode_no]["status"])
 						
 							
 					else:			
-						cur_episode  = show_data['seasons'][season_no][episode_no];
+						cur_episode  = show_data['seasons'][season_no][episode_no]
 						
 						if cur_episode['status'] == "Error_retry":
 							if cur_episode["attempt"] <= 5:
@@ -198,15 +203,18 @@ def main(argv):
 							else:
 								show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_retry_failed",'request_id' : 0, 'attempt' : 5}
 						else:
-							if (cur_episode['status']!= "downloaded" ) or (cur_episode['status'] != "ERROR_no_magnet") or (cur_episode['status'] != "ERROR_retry_failed"):					
+							if (cur_episode['status']!= "downloaded" ) and (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):					
 								off_cloud_status = get_torrent_status(cur_episode['request_id'])													
 								if off_cloud_status['status']['status'] == "downloaded":
 
 									show_data['seasons'][season_no][episode_no]['status'] = off_cloud_status['status']['status']
-									# write code to push the directory structure to google sheets that will be used to organize the files							
+									# write code to push the directory structure to google sheets that will be used to organize the files									
+				else:
+					break
+				json.dump(show_data, open(db_directory + show_file, 'w'))
+				print("writing updated data to disk")
+				
 			json.dump(show_data, open(db_directory + show_file, 'w'))
-			exit()
-		json.dump(show_data, open(db_directory + show_file, 'w'))
 
 if __name__ == '__main__':
 	main(sys.argv)

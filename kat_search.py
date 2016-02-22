@@ -35,9 +35,7 @@ def get_tv_show_episode(show_name, season, episode):
 	# print "seeders: " + torrent['seeders']
 	# print  "magnet Link : " + torrent['magnet']
 
-def search_keyword_in_name(name, keywords):
-	
-	match = True
+def search_keyword_in_name(name, keywords):	
 	name = name.lower()		
 	name = name.split(' ')
 
@@ -45,9 +43,9 @@ def search_keyword_in_name(name, keywords):
 		search_res = [s for s in name if keyword.lower() == s]
 		if search_res == []:
 			print 'keyword "'+keyword +  ' not matched'
-			match = False
+			return False
 			
-	return match
+	return True
 
 def remove_brackets(str_list):
 	list = []
@@ -79,7 +77,6 @@ def get_magnet_link(search_list, category):
 			torrent['magnet'] = cur_struct[0].find(attrs={"title" : "Torrent magnet link"})['href']
 			torrent['size'] = cur_struct[1].getText()
 			torrent['seeders']= cur_struct[4].getText()				
-			return torrent
-			break
+			return torrent			
 					
 	return None
