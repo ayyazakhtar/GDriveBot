@@ -177,7 +177,7 @@ def main(argv):
 												
 					if (len(show_data['seasons'][season_no]) < (episode.EpisodeNumber)):
 						show_data['seasons'][season_no].append({})
-					
+				
 					if show_data['seasons'][season_no][episode_no] == {}:
 						episode_torrent = kat_search.get_tv_show_episode(show.SeriesName, season.season_number, episode.EpisodeNumber)						
 						

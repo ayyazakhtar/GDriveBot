@@ -77,6 +77,7 @@ def init():
     "fileName": ""
   }	
 } '''
+
 def check_status(requestId ):
 	url = "https://offcloud.com/api/remote/status"
 	data = {"requestId" :requestId }
