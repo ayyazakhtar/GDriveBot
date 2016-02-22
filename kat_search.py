@@ -22,6 +22,8 @@ def get_tv_show_episode(show_name, season, episode):
 		ep_string = ep_string  + "E" + str(episode)		
 
 	show_name = show_name.split(' ')
+	print show_name
+	print "check if there is a spce at the end of the show name if not do add"
 	show_name.append(ep_string)
 
 	torrent = get_magnet_link(show_name, "tv")
@@ -82,4 +84,8 @@ def get_magnet_link(search_list, category):
 			return torrent
 			break
 					
+<<<<<<< HEAD
 	return None
+=======
+	return None;
+>>>>>>> 88623db36cdb85eaf17178bf76319b4faa6b43c6
