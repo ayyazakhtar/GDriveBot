@@ -172,9 +172,15 @@ def main(argv):
 				print '\tEpisode : ' + str(episode.EpisodeNumber)
 				episode_no = episode.EpisodeNumber - 1
 				today = (date.today()).toordinal()
-
-				ep_date = (episode.FirstAired).toordinal()
-				if ep_date < today + 1 : 				# +1 to download episodes that are atleast a day old.
+				# print episode.FirstAired
+				# print type(episode.FirstAired)
+				if type(episode.FirstAired) != type(date.today()):					
+					ep_date = (datetime.strptime(episode.FirstAired, "%Y-%m-%d")).toordinal()
+				else:
+					ep_date = (episode.FirstAired).toordinal()	
+				# print "ep_date : "+(ep_date)
+				# print "today : "+ (today)
+				if ep_date < today - 1 : 				# - 1 to download episodes that are atleast a day old.
 												
 					if (len(show_data['seasons'][season_no]) < (episode.EpisodeNumber)):
 						show_data['seasons'][season_no].append({})
@@ -185,6 +191,7 @@ def main(argv):
 						if episode_torrent == None:														
 							if cur_ep not in show_data["erred_episodes"]:
 								show_data["erred_episodes"].append(cur_ep)
+								print "Adding to Errored episodes"
 							# show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_no_magnet",'request_id' : 0, 'attempt' : 1}
 							print("ERROR_no_magnet")
 						else:							
@@ -203,10 +210,11 @@ def main(argv):
 							else:
 								show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_retry_failed",'request_id' : 0, 'attempt' : 5}
 						else:
-							if (cur_episode['status']!= "downloaded" ) and (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):					
+							if (cur_episode['status']== "downloaded" ):
+								print "downloaded succesfully"
+							elif (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):					
 								off_cloud_status = get_torrent_status(cur_episode['request_id'])													
 								if off_cloud_status['status']['status'] == "downloaded":
-
 									show_data['seasons'][season_no][episode_no]['status'] = off_cloud_status['status']['status']
 									# write code to push the directory structure to google sheets that will be used to organize the files									
 				else:
