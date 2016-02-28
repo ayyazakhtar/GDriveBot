@@ -131,7 +131,7 @@ def start_episode_download(magnet, attempt):
 	else:
 		episode_data['status'] = "Error_retry"
 		episode_data['request_id'] = 0
-	episode_data['attemp'] = attempt + 1	
+	episode_data['attempt'] = attempt + 1	
 	return episode_data
 	
 	
@@ -198,9 +198,7 @@ def main(argv):
 							show_data['seasons'][season_no][episode_no] = start_episode_download(episode_torrent['magnet'], 0)
 							if cur_ep in show_data["erred_episodes"]:
 								show_data["erred_episodes"].remove(cur_ep)
-							# print(show_data['seasons'][season_no][episode_no]["status"])
-						
-							
+							# print(show_data['seasons'][season_no][episode_no]["status"])													
 					else:			
 						cur_episode  = show_data['seasons'][season_no][episode_no]
 						
@@ -212,11 +210,16 @@ def main(argv):
 						else:
 							if (cur_episode['status']== "downloaded" ):
 								print "downloaded succesfully"
-							elif (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):					
-								off_cloud_status = get_torrent_status(cur_episode['request_id'])													
+							elif (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):
+								off_cloud_status = get_torrent_status(cur_episode['request_id'])
 								if off_cloud_status['status']['status'] == "downloaded":
 									show_data['seasons'][season_no][episode_no]['status'] = off_cloud_status['status']['status']
 									# write code to push the directory structure to google sheets that will be used to organize the files									
+								elif off_cloud_status['status']['status'] == "error":
+									show_data['seasons'][season_no][episode_no]['status'] = "Error_retry"
+									print "these downloads are in error state"
+								elif off_cloud_status['status']['status'] == "queued":									
+									print (off_cloud_status['status'])
 				else:
 					break
 				json.dump(show_data, open(db_directory + show_file, 'w'))

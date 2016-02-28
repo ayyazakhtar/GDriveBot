@@ -82,8 +82,7 @@ def check_status(requestId ):
 	url = "https://offcloud.com/api/remote/status"
 	data = {"requestId" :requestId }
 	response = requests.post(url,data=data,cookies=offcloud_auth_cookie)
-	print response
-	print response.text
+
 	if response.status_code == 200:
 		return(json.loads(response.text))
 	else:
