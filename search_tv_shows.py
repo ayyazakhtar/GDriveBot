@@ -5,12 +5,14 @@ import os
 import fnmatch
 import offcloud_api
 import kat_search
+#from debug import debug_print
+import debug
 import sqlite3 as lite
 from datetime import date
 from datetime import datetime
 from pprint import pprint
 
-
+debug.debug_level = 0
 
 offcloud_user_name =  'mraqkhan@icloud.com'
 offcloud_password = 'Pakland990'
@@ -105,6 +107,7 @@ Episode Info FOrmat
 
 def start_episode_download(magnet, attempt):
 	down_data = offcloud_api.get_remote_download(magnet)		
+	print down_data
 	episode_data = {}
 	episode_data['magnet'] = magnet
 	
@@ -119,14 +122,20 @@ def start_episode_download(magnet, attempt):
 	
 	
 def main(argv):	
+	debug.dbprint("this is sparta mofo : " + str(10), 1);
 	offcloud_api.offcloud_init()
+	debug.dbprint("this is sparta mofo : " + str(10), 1);
+	exit();
 	db = api.TVDB("B43FF87DE395DF56")
 	cwd = os.path.dirname(os.path.realpath(__file__))
 	db_directory = cwd + "/database/tvshows/"
 	
 	if len(argv) > 1:
+		print "extra arguements provided"
 		if argv[1] == 'add':		#	Adding new TV shows to download list
 			get_new_show_input(db_directory)
+		else:
+			print "invalid arguement passed"
 			
 	file_list = []			
 	for file in os.listdir(db_directory):
