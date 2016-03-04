@@ -89,6 +89,22 @@ def check_status(requestId ):
 		return None
 ###############################################################################
 	
+def get_remote_download(magnet):
+	if offcloud_auth_cookie == '':
+	    auth_offcloud(offcloud_user_name, offcloud_password)
+	return add_remote_download(magnet)		
+
+def offcloud_init():
+	if offcloud_auth_cookie == '':
+	    auth_offcloud(offcloud_user_name, offcloud_password)
+	init()
+		
+		
+def get_torrent_status(requestId):
+	# also add time based token expiry and re authorization
+	if offcloud_auth_cookie == '':
+		auth_offcloud(offcloud_user_name, offcloud_password)
+	return check_status(requestId)
 
 status_msgs = ["created", "downloading", "downloaded"]
 

@@ -103,25 +103,8 @@ Episode Info FOrmat
 "attempt"
 }'''
 
-def get_remote_download(magnet):
-	if offcloud_api.offcloud_auth_cookie == '':
-		offcloud_api.auth_offcloud(offcloud_user_name, offcloud_password)
-	return offcloud_api.add_remote_download(magnet)		
-
-def offcloud_init():
-	if offcloud_api.offcloud_auth_cookie == '':
-		offcloud_api.auth_offcloud(offcloud_user_name, offcloud_password)
-	offcloud_api.init()
-		
-		
-def get_torrent_status(requestId):
-	# also add time based token expiry and re authorization
-	if offcloud_api.offcloud_auth_cookie == '':
-		auth_offcloud(offcloud_user_name, offcloud_password)
-	return offcloud_api.check_status(requestId)
-
 def start_episode_download(magnet, attempt):
-	down_data = get_remote_download(magnet)		
+	down_data = offcloud_api.get_remote_download(magnet)		
 	episode_data = {}
 	episode_data['magnet'] = magnet
 	
@@ -136,11 +119,10 @@ def start_episode_download(magnet, attempt):
 	
 	
 def main(argv):	
-	offcloud_init()
+	offcloud_api.offcloud_init()
 	db = api.TVDB("B43FF87DE395DF56")
 	cwd = os.path.dirname(os.path.realpath(__file__))
 	db_directory = cwd + "/database/tvshows/"
-
 	
 	if len(argv) > 1:
 		if argv[1] == 'add':		#	Adding new TV shows to download list
@@ -191,7 +173,7 @@ def main(argv):
 						if episode_torrent == None:														
 							if cur_ep not in show_data["erred_episodes"]:
 								show_data["erred_episodes"].append(cur_ep)
-								print "Adding to Errored episodes"
+								print "Adding to Errored episodes No torrent found"
 							# show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_no_magnet",'request_id' : 0, 'attempt' : 1}
 							print("ERROR_no_magnet")
 						else:							
@@ -208,18 +190,25 @@ def main(argv):
 							else:
 								show_data['seasons'][season_no][episode_no] = { 'magnet' : "", 'status' : "ERROR_retry_failed",'request_id' : 0, 'attempt' : 5}
 						else:
-							if (cur_episode['status']== "downloaded" ):
-								print "downloaded succesfully"
-							elif (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):
-								off_cloud_status = get_torrent_status(cur_episode['request_id'])
+							#if (cur_episode['status']== "downloaded" ):
+							#	print "downloaded succesfully"
+							#elif (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):
+							if (cur_episode['status'] != "ERROR_no_magnet") and (cur_episode['status'] != "ERROR_retry_failed"):
+								off_cloud_status = offcloud_api.get_torrent_status(cur_episode['request_id'])
+								print (off_cloud_status['status'])
 								if off_cloud_status['status']['status'] == "downloaded":
 									show_data['seasons'][season_no][episode_no]['status'] = off_cloud_status['status']['status']
-									# write code to push the directory structure to google sheets that will be used to organize the files									
+									print "send the follwing data to a google sheet"
+									print "title " + show_data['title']
+									print "season " + str(season.season_number)
+									print  "episode " + str(episode.EpisodeNumber)
+									print "if possible rename the file for convenience"
+
+									# write code to push the directory structure to google sheets that will be used to organize the files	
 								elif off_cloud_status['status']['status'] == "error":
 									show_data['seasons'][season_no][episode_no]['status'] = "Error_retry"
 									print "these downloads are in error state"
-								elif off_cloud_status['status']['status'] == "queued":									
-									print (off_cloud_status['status'])
+								#elif off_cloud_status['status']['status'] == "queued":									
 				else:
 					break
 				json.dump(show_data, open(db_directory + show_file, 'w'))
