@@ -1,0 +1,10 @@
+{
+"debug_level"= 0,
+"max_active_downloads" : 5, 
+"cur_active_downloads" : 0,
+"mov_to_down_file" : "database/movies/movies_to_download.json", 
+"mov_downloaded_file" : "database/movies/movies_downloaded.json",
+"offcloud_user_name" : "",
+"offcloud_password" : "",
+"offcloud_remote_user_name" : ""
+}
