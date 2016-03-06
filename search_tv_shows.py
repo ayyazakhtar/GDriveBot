@@ -6,14 +6,18 @@ import fnmatch
 import offcloud_api
 import kat_search
 #from debug import debug_print
-import debug
+# import debug
 import sqlite3 as lite
 from datetime import date
 from datetime import datetime
 from pprint import pprint
+import feedparser
 
-debug.debug_level = 0
+# debug.debug_level = 0
+mov_downloaded_file = "movies_downloaded.json"
+mov_to_down_file = "movies_to_download.json"
 
+imdb_lists = ["http://rss.imdb.com/user/ur30511277/watchlist", "http://rss.imdb.com/user/ur30511277/ratings"]
 offcloud_user_name =  'mraqkhan@icloud.com'
 offcloud_password = 'Pakland990'
 
@@ -119,12 +123,37 @@ def start_episode_download(magnet, attempt):
 		episode_data['request_id'] = 0
 	episode_data['attempt'] = attempt + 1	
 	return episode_data
+		
+def add_movie_to_down_list(id):
+	cwd = os.path.dirname(os.path.realpath(__file__))
+	movie_db_directory = cwd + "/database/movies/"
+
+	movies_downloaded = json.load(open(movie_db_directory + mov_downloaded_file))
+	movies_to_download = json.load(open(movie_db_directory + mov_to_down_file))
+				
+	if (id not in movies_to_download ) and (id not in movies_downloaded):
+		print "movie does not exist in list adding"
+		movies_to_download.append(id)
+		
+	json.dump(movies_downloaded, open(movie_db_directory + mov_downloaded_file, 'w'))
+	json.dump(movies_to_download, open(movie_db_directory + mov_to_down_file, 'w'))
+				
+def get_rss_movie_updates():
+	for rss_url in imdb_lists:
+		data = feedparser.parse(rss_url)				
+		for item in data['entries']:
+			id = item['id'].split("/")[-2]
+			add_movie_to_down_list(id)
+
 	
 	
 def main(argv):	
-	debug.dbprint("this is sparta mofo : " + str(10), 1);
+	
+	get_rss_movie_updates()
+	exit()
+	# debug.dbprint("this is sparta mofo : " + str(10), 1);
 	offcloud_api.offcloud_init()
-	debug.dbprint("this is sparta mofo : " + str(10), 1);
+	# debug.dbprint("this is sparta mofo : " + str(10), 1);
 	exit();
 	db = api.TVDB("B43FF87DE395DF56")
 	cwd = os.path.dirname(os.path.realpath(__file__))

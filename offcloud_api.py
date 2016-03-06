@@ -4,11 +4,11 @@ from datetime import date
 import datetime
 import os
 import requests
-import debug
+# import debug
 from pprint import pprint
 import json
 
-debug.debug_level = 2
+# debug.debug_level = 2
 
 ############################## ------------ OFFCLoud -------------####################################
 
@@ -97,7 +97,7 @@ def get_remote_download(magnet):
 	return add_remote_download(magnet)		
 
 def offcloud_init():
-	debug.dbprint("Initializing offcloud connection", 2);
+	# debug.dbprint("Initializing offcloud connection", 2);
 	if offcloud_auth_cookie == '':
 	    auth_offcloud(offcloud_user_name, offcloud_password)
 	init()
