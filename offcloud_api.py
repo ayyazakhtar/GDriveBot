@@ -11,11 +11,10 @@ import json
 # debug.debug_level = 2
 
 ############################## ------------ OFFCLoud -------------####################################
-
-offcloud_user_name =  'mraqkhan@icloud.com'
-offcloud_password = 'Pakland990'
+offcloud_user_name = ''
+offcloud_password = ''
 offcloud_auth_cookie= ''
-my_user_name = '13mseeaakhtar@seecs.edu.pk'
+offcloud_remote_user_name  = ''
 my_account = {}
 
 # this has to be set before
@@ -63,7 +62,7 @@ def init():
 	global my_account
 	account_info =get_remote_account_list()	
 	for account in account_info['data']:
-		if account['username'] == my_user_name:
+		if account['username'] == offcloud_remote_user_name:
 			my_account = account
 	
 	

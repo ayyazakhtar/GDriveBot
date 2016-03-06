@@ -1,5 +1,5 @@
 {
-"debug_level"= 0,
+"debug_level" : 0,
 "max_active_downloads" : 5, 
 "cur_active_downloads" : 0,
 "mov_to_down_file" : "database/movies/movies_to_download.json", 

@@ -4,7 +4,7 @@ import json
 import os
 import fnmatch
 import offcloud_api
-import kat_search
+# import kat_search
 #from debug import debug_print
 # import debug
 import sqlite3 as lite
@@ -14,12 +14,13 @@ from pprint import pprint
 import feedparser
 
 # debug.debug_level = 0
-mov_downloaded_file = "movies_downloaded.json"
-mov_to_down_file = "movies_to_download.json"
-
+mov_downloaded_file = ''
+mov_to_down_file  = ''
+config_file = "myconfig.json"
+# system_state_file = "config.json"
+max_active_downloads = ''
+cur_active_downloads  = ''
 imdb_lists = ["http://rss.imdb.com/user/ur30511277/watchlist", "http://rss.imdb.com/user/ur30511277/ratings"]
-offcloud_user_name =  'mraqkhan@icloud.com'
-offcloud_password = 'Pakland990'
 
 def get_new_show_input(db_directory):
 	db = api.TVDB("B43FF87DE395DF56")
@@ -144,19 +145,19 @@ def get_rss_movie_updates():
 		for item in data['entries']:
 			id = item['id'].split("/")[-2]
 			add_movie_to_down_list(id)
-
-	
 	
 def main(argv):	
+	
+	cwd = os.path.dirname(os.path.realpath(__file__))
+	system_state = json.load(open(cwd + config_file))
 	
 	get_rss_movie_updates()
 	exit()
 	# debug.dbprint("this is sparta mofo : " + str(10), 1);
 	offcloud_api.offcloud_init()
 	# debug.dbprint("this is sparta mofo : " + str(10), 1);
-	exit();
 	db = api.TVDB("B43FF87DE395DF56")
-	cwd = os.path.dirname(os.path.realpath(__file__))
+	
 	db_directory = cwd + "/database/tvshows/"
 	
 	if len(argv) > 1:
