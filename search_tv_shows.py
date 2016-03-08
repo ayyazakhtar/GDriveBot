@@ -144,21 +144,13 @@ def get_rss_movie_updates():
 	
 def load_configuration():
 	cwd = os.path.dirname(os.path.realpath(__file__))
-	global config = json.load(open(cwd + '/' + config_file))
-	pprint(config)
-	debug.debug_level = config['debug_level']
-	mov_downloaded_file = config['mov_downloaded_file']
-	mov_to_down_file  = config['mov_to_down_file']
-	max_active_downloads = ''
-	cur_active_downloads  = ''
-	imdb_lists = ["http://rss.imdb.com/user/ur30511277/watchlist", "http://rss.imdb.com/user/ur30511277/ratings"]
+	global config;
+	global imdb_lists;
+	config = json.load(open(cwd + '/' + config_file))
+	imdb_lists = json.load(open(cwd + '/' + config["imdb_rss_links_file"]))
 
 def main(argv):	
 	load_configuration()
-	exit()
-	cwd = os.path.dirname(os.path.realpath(__file__))
-	system_state = json.load(open(cwd + config_file))
-
 
 	get_rss_movie_updates()
 	exit()
