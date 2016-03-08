@@ -6,20 +6,16 @@ import fnmatch
 import offcloud_api
 # import kat_search
 #from debug import debug_print
-# import debug
+import debug
 import sqlite3 as lite
 from datetime import date
 from datetime import datetime
 from pprint import pprint
 import feedparser
 
-# debug.debug_level = 0
-mov_downloaded_file = ''
-mov_to_down_file  = ''
 config_file = "myconfig.json"
+config = {}
 # system_state_file = "config.json"
-max_active_downloads = ''
-cur_active_downloads  = ''
 imdb_lists = ["http://rss.imdb.com/user/ur30511277/watchlist", "http://rss.imdb.com/user/ur30511277/ratings"]
 
 def get_new_show_input(db_directory):
@@ -146,32 +142,45 @@ def get_rss_movie_updates():
 			id = item['id'].split("/")[-2]
 			add_movie_to_down_list(id)
 	
+def load_configuration():
+	cwd = os.path.dirname(os.path.realpath(__file__))
+	global config = json.load(open(cwd + '/' + config_file))
+	pprint(config)
+	debug.debug_level = config['debug_level']
+	mov_downloaded_file = config['mov_downloaded_file']
+	mov_to_down_file  = config['mov_to_down_file']
+	max_active_downloads = ''
+	cur_active_downloads  = ''
+	imdb_lists = ["http://rss.imdb.com/user/ur30511277/watchlist", "http://rss.imdb.com/user/ur30511277/ratings"]
+
 def main(argv):	
-	
+	load_configuration()
+	exit()
 	cwd = os.path.dirname(os.path.realpath(__file__))
 	system_state = json.load(open(cwd + config_file))
-	
+
+
 	get_rss_movie_updates()
 	exit()
 	# debug.dbprint("this is sparta mofo : " + str(10), 1);
 	offcloud_api.offcloud_init()
 	# debug.dbprint("this is sparta mofo : " + str(10), 1);
 	db = api.TVDB("B43FF87DE395DF56")
-	
+
 	db_directory = cwd + "/database/tvshows/"
-	
+
 	if len(argv) > 1:
 		print "extra arguements provided"
 		if argv[1] == 'add':		#	Adding new TV shows to download list
 			get_new_show_input(db_directory)
 		else:
 			print "invalid arguement passed"
-			
+
 	file_list = []			
 	for file in os.listdir(db_directory):
 		if fnmatch.fnmatch(file, '*.json'):
 			file_list.append(file)		
-			
+
 	print file_list
 	for show_file in file_list:
 		show_data = json.load(open(db_directory + show_file))	
@@ -181,14 +190,14 @@ def main(argv):
 
 		for season in show:
 			season_no = season.season_number - 1
-				
+
 			if season.season_number == 0:
 				continue
 			print 'Season : ' + str(season.season_number) 
-				
+
 			if (len(show_data['seasons']) < (season.season_number)):
 				show_data['seasons'].append([])	
-				
+
 			for episode in season:	
 				print '\tEpisode : ' + str(episode.EpisodeNumber)
 				episode_no = episode.EpisodeNumber - 1
@@ -202,10 +211,10 @@ def main(argv):
 				# print "ep_date : "+(ep_date)
 				# print "today : "+ (today)
 				if ep_date < today - 1 : 				# - 1 to download episodes that are atleast a day old.
-												
+
 					if (len(show_data['seasons'][season_no]) < (episode.EpisodeNumber)):
 						show_data['seasons'][season_no].append({})
-				
+
 					if show_data['seasons'][season_no][episode_no] == {}:
 						episode_torrent = kat_search.get_tv_show_episode(show.SeriesName, season.season_number, episode.EpisodeNumber)						
 						cur_ep = {"season":season.season_number, "episode":episode.EpisodeNumber}
@@ -222,7 +231,7 @@ def main(argv):
 							# print(show_data['seasons'][season_no][episode_no]["status"])													
 					else:			
 						cur_episode  = show_data['seasons'][season_no][episode_no]
-						
+
 						if cur_episode['status'] == "Error_retry":
 							if cur_episode["attempt"] <= 5:
 								show_data['seasons'][season_no][episode_no] = start_episode_download(cur_episode['magnet'], cur_episode["attempt"])							
