@@ -1,0 +1,11 @@
+{
+"debug_level" : 1,
+"max_active_downloads" : 5, 
+"cur_active_downloads" : 0,
+"imdb_rss_links_file" : "imdb_rss_links.json",
+"mov_to_down_file" : "database/movies/movies_to_download.json", 
+"mov_downloaded_file" : "database/movies/movies_downloaded.json",
+"offcloud_user_name" : "mraqkhan@seecs.edu.pk",
+"offcloud_password" : "Pakland990",
+"offcloud_remote_user_name" : "13mseeaakhtar@seecs.edu.pk"
+}
